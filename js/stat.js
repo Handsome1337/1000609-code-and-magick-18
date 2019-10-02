@@ -1,3 +1,5 @@
+'use strict';
+
 /* Учебный проект, второе задание */
 
 var CLOUD_WIDTH = 420;
@@ -22,17 +24,17 @@ var renderCloud = function (ctx, x, y, color) {
 
 var renderColumn = function (ctx, x, y, height) {
   ctx.fillRect(x, y, COLUMN_WIDTH, height);
-}
+};
 
-var renderResults = function(ctx, text, x, y) {
+var renderResults = function (ctx, text, x, y) {
   ctx.fillStyle = '#000000';
-  if (typeof(text) === 'number') {
+  if (typeof (text) === 'number') {
     text = Math.round(text);
   }
   ctx.fillText(text, x, y);
-}
+};
 
-var getMaxElement = function(arr) {
+var getMaxElement = function (arr) {
   var maxElement = arr[0];
   for (var i = 1; i < arr.length; i++) {
     if (arr[i] > maxElement) {
@@ -43,10 +45,10 @@ var getMaxElement = function(arr) {
 };
 
 var getRandomInt = function (min, max) {
-	return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
 
-window.renderStatistics = function(ctx, names, times) {
+window.renderStatistics = function (ctx, names, times) {
   /* Сравнивает длины массивов с именами и временами. В случае, если не хватает пары к какому-либо из значений, больший массив обрезается */
   var namesLength = names.length;
   var timesLength = times.length;
@@ -87,6 +89,6 @@ window.renderStatistics = function(ctx, names, times) {
     /* Отрисовывает имена и времена */
     ctx.textAlign = 'start';
     renderResults(ctx, names[i], CLOUD_X + INDENT + (COLUMN_WIDTH + SPACING) * i, PLAYER_Y);
-    renderResults(ctx, times[i], CLOUD_X + INDENT + (COLUMN_WIDTH + SPACING) * i, COLUMN_ROOF + (COLUMN_HIGHEST - ((COLUMN_HIGHEST * times[i]) / maxTime)) - TEXT_SPACING)
+    renderResults(ctx, times[i], CLOUD_X + INDENT + (COLUMN_WIDTH + SPACING) * i, COLUMN_ROOF + (COLUMN_HIGHEST - ((COLUMN_HIGHEST * times[i]) / maxTime)) - TEXT_SPACING);
   }
 };
