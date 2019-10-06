@@ -74,13 +74,13 @@ var renderPlayerResult = function (ctx, i, names, times) {
   /* Выбирает максимальное время из [times] */
   var maxTime = getMaxElement(times);
 
-  /* Расчитывает координату X для колонки */
+  /* Рассчитывает координату X для колонки */
   var columnX = CLOUD_X + INDENT + (COLUMN_WIDTH + SPACING) * i;
 
-  /* Расчитывает координату Y для колонки */
+  /* Рассчитывает координату Y для колонки */
   var columnY = COLUMN_ROOF + (COLUMN_HIGHEST - ((COLUMN_HIGHEST * times[i]) / maxTime));
 
-  /* Расчитывает высоту колонки */
+  /* Рассчитывает высоту колонки */
   var columnHeight = (COLUMN_HIGHEST * times[i]) / maxTime;
 
   renderColumn(ctx, columnX, columnY, columnHeight);
