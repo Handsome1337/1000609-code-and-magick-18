@@ -22,12 +22,14 @@ var renderCloud = function (ctx, x, y, color) {
   ctx.fillRect(x, y, CLOUD_WIDTH, CLOUD_HEIGHT);
 };
 
-var renderColumn = function (ctx, x, y, height) {
+var renderColumn = function (ctx, x, y, color, height) {
+  ctx.fillStyle = color;
   ctx.fillRect(x, y, COLUMN_WIDTH, height);
 };
 
 var renderResults = function (ctx, text, x, y) {
   ctx.fillStyle = '#000000';
+  ctx.textAlign = 'start';
   if (typeof (text) === 'number') {
     text = Math.round(text);
   }
@@ -59,6 +61,15 @@ var equateArrs = function (arr1, arr2) {
   return [arr1, arr2];
 };
 
+var getColumnColor = function (ctx, str) {
+  var randomSaturation = getRandomInt(1, 100) + '%';
+  ctx.fillStyle = 'hsl(240, ' + randomSaturation + ', 50%)';
+  if (str === 'Вы') {
+    ctx.fillStyle = 'rgba(255, 0, 0, 1)';
+  }
+  return ctx.fillStyle;
+};
+
 /* Отрисовывает поздравление */
 var renderGreeting = function (ctx) {
   ctx.font = '16px PT Mono';
@@ -70,37 +81,28 @@ var renderGreeting = function (ctx) {
 };
 
 /* Отрисовывает колонку с результатом одного игрока */
-var renderPlayerResult = function (ctx, i, names, times) {
-  /* Выбирает максимальное время из [times] */
-  var maxTime = getMaxElement(times);
-
-  /* Рассчитывает координату X для колонки */
-  var columnX = CLOUD_X + INDENT + (COLUMN_WIDTH + SPACING) * i;
-
-  /* Рассчитывает координату Y для колонки */
-  var columnY = COLUMN_ROOF + (COLUMN_HIGHEST - ((COLUMN_HIGHEST * times[i]) / maxTime));
-
-  /* Рассчитывает высоту колонки */
-  var columnHeight = (COLUMN_HIGHEST * times[i]) / maxTime;
-
-  renderColumn(ctx, columnX, columnY, columnHeight);
-
-  ctx.textAlign = 'start';
-  renderResults(ctx, names[i], columnX, PLAYER_Y);
-  renderResults(ctx, times[i], columnX, columnY - TEXT_SPACING);
+var renderPlayerResult = function (ctx, x, y, name, time, color, height) {
+  renderColumn(ctx, x, y, color, height);
+  renderResults(ctx, name, x, PLAYER_Y);
+  renderResults(ctx, time, x, y - TEXT_SPACING);
 };
 
 /* Отрисовывает колонки с результатами всех игроков */
 var renderAllPlayersResults = function (ctx, names, times) {
-  for (var i = 0; i < names.length; i++) {
-    /* Определяет цвет колонки */
-    var randomSaturation = getRandomInt(1, 100) + '%';
-    ctx.fillStyle = 'hsl(240, ' + randomSaturation + ', 50%)';
-    if (names[i] === 'Вы') {
-      ctx.fillStyle = 'rgba(255, 0, 0, 1)';
-    }
+  /* Выбирает максимальное время из [times] */
+  var maxTime = getMaxElement(times);
 
-    renderPlayerResult(ctx, i, names, times);
+  for (var i = 0; i < names.length; i++) {
+    /* Рассчитывает координату X для колонки */
+    var columnX = CLOUD_X + INDENT + (COLUMN_WIDTH + SPACING) * i;
+
+    /* Рассчитывает координату Y для колонки */
+    var columnY = COLUMN_ROOF + (COLUMN_HIGHEST - ((COLUMN_HIGHEST * times[i]) / maxTime));
+
+    /* Рассчитывает высоту колонки */
+    var columnHeight = (COLUMN_HIGHEST * times[i]) / maxTime;
+
+    renderPlayerResult(ctx, columnX, columnY, names[i], times[i], getColumnColor(ctx, names[i]), columnHeight);
   }
 };
 
