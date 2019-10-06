@@ -48,33 +48,50 @@ var getRandomInt = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-window.renderStatistics = function (ctx, names, times) {
-  /* Сравнивает длины массивов с именами и временами. В случае, если не хватает пары к какому-либо из значений, больший массив обрезается */
-  var namesLength = names.length;
-  var timesLength = times.length;
-  if (namesLength !== timesLength) {
-    if (namesLength > timesLength) {
-      names = names.slice(0, timesLength - 1);
-    } else {
-      times = times.slice(0, namesLength - 1);
-    }
+var equateArrs = function (arr1, arr2) {
+  var arr1Length = arr1.length;
+  var arr2Length = arr2.length;
+  if (arr1Length > arr2Length) {
+    arr1 = arr1.slice(0, arr2Length);
+  } else if (arr1Length < arr2Length) {
+    arr2 = arr2.slice(0, arr1Length);
   }
+  return [arr1, arr2];
+};
 
-  /* Отрисовывает облако и тень */
-  renderCloud(ctx, CLOUD_X + OFFSET, CLOUD_Y + OFFSET, 'rgba(0, 0, 0, 0.7)');
-  renderCloud(ctx, CLOUD_X, CLOUD_Y, '#ffffff');
-
-  /* Отрисовывает поздравление */
+/* Отрисовывает поздравление */
+var renderGreeting = function (ctx) {
   ctx.font = '16px PT Mono';
   ctx.fillStyle = '#000000';
   ctx.textBaseline = 'hanging';
   ctx.textAlign = 'center';
   renderResults(ctx, 'Ура, Вы победили!', CLOUD_X_CENTER, GREETING_Y);
   renderResults(ctx, 'Список результатов:', CLOUD_X_CENTER, GREETING_Y + TEXT_SPACING);
+};
 
+/* Отрисовывает колонку с результатом одного игрока */
+var renderPlayerResult = function (ctx, i, names, times) {
   /* Выбирает максимальное время из [times] */
   var maxTime = getMaxElement(times);
 
+  /* Расчитывает координату X для колонки */
+  var columnX = CLOUD_X + INDENT + (COLUMN_WIDTH + SPACING) * i;
+
+  /* Расчитывает координату Y для колонки */
+  var columnY = COLUMN_ROOF + (COLUMN_HIGHEST - ((COLUMN_HIGHEST * times[i]) / maxTime));
+
+  /* Расчитывает высоту колонки */
+  var columnHeight = (COLUMN_HIGHEST * times[i]) / maxTime;
+
+  renderColumn(ctx, columnX, columnY, columnHeight);
+
+  ctx.textAlign = 'start';
+  renderResults(ctx, names[i], columnX, PLAYER_Y);
+  renderResults(ctx, times[i], columnX, columnY - TEXT_SPACING);
+};
+
+/* Отрисовывает колонки с результатами всех игроков */
+var renderAllPlayersResults = function (ctx, names, times) {
   for (var i = 0; i < names.length; i++) {
     /* Определяет цвет колонки */
     var randomSaturation = getRandomInt(1, 100) + '%';
@@ -83,12 +100,20 @@ window.renderStatistics = function (ctx, names, times) {
       ctx.fillStyle = 'rgba(255, 0, 0, 1)';
     }
 
-    /* Отрисовывает колонки */
-    renderColumn(ctx, CLOUD_X + INDENT + (COLUMN_WIDTH + SPACING) * i, COLUMN_ROOF + (COLUMN_HIGHEST - ((COLUMN_HIGHEST * times[i]) / maxTime)), (COLUMN_HIGHEST * times[i]) / maxTime);
-
-    /* Отрисовывает имена и времена */
-    ctx.textAlign = 'start';
-    renderResults(ctx, names[i], CLOUD_X + INDENT + (COLUMN_WIDTH + SPACING) * i, PLAYER_Y);
-    renderResults(ctx, times[i], CLOUD_X + INDENT + (COLUMN_WIDTH + SPACING) * i, COLUMN_ROOF + (COLUMN_HIGHEST - ((COLUMN_HIGHEST * times[i]) / maxTime)) - TEXT_SPACING);
+    renderPlayerResult(ctx, i, names, times);
   }
+};
+
+window.renderStatistics = function (ctx, names, times) {
+  /* Сравнивает длины массивов с именами и временами. В случае, если не хватает пары к какому-либо из значений, больший массив обрезается */
+  var results = equateArrs(names, times);
+  names = results[0];
+  times = results[1];
+
+  /* Отрисовывает облако и тень */
+  renderCloud(ctx, CLOUD_X + OFFSET, CLOUD_Y + OFFSET, 'rgba(0, 0, 0, 0.7)');
+  renderCloud(ctx, CLOUD_X, CLOUD_Y, '#ffffff');
+
+  renderGreeting(ctx);
+  renderAllPlayersResults(ctx, names, times);
 };
